@@ -8,6 +8,9 @@ export default function ManageSidebar() {
   const pathname = usePathname()
   const [open, setOpen] = useState(false)
 
+  // на логине сайдбар не показываем
+  if (pathname === '/manage/login') return null
+
   // закрывать сайдбар при переходе по ссылке
   useEffect(() => {
     setOpen(false)

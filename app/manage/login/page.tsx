@@ -27,39 +27,44 @@ export default function AdminLoginPage() {
   }
 
   return (
-    <main className="min-h-screen flex items-center justify-center bg-neutral-50">
+    <main className="min-h-screen flex items-center justify-center bg-neutral-50 px-4">
       <form
         onSubmit={handleSubmit}
-        className="bg-white rounded-lg border border-neutral-200 p-6 w-full max-w-sm space-y-4"
+        className="bg-white rounded-2xl border-2 border-neutral-200 p-6 w-full max-w-sm space-y-4 shadow-sm"
       >
-        <h1 className="text-xl font-medium">Вход в кабинет</h1>
         <div>
-          <label className="block text-sm text-neutral-600 mb-1">Email</label>
+          <h1 className="text-2xl font-bold text-neutral-900">Borsok</h1>
+          <p className="text-sm font-medium text-neutral-700 mt-0.5">Вход для менеджера</p>
+        </div>
+        <div>
+          <label className="block text-sm font-semibold text-neutral-800 mb-1.5">Email</label>
           <input
             type="email"
             value={email}
             onChange={(e) => setEmail(e.target.value)}
             required
-            className="w-full border border-neutral-200 rounded-lg px-3 py-2 text-sm focus:outline-none focus:border-neutral-400"
+            className="w-full border-2 border-neutral-200 rounded-lg px-3 py-2.5 text-base text-neutral-900 focus:outline-none focus:border-amber-500 transition"
           />
         </div>
         <div>
-          <label className="block text-sm text-neutral-600 mb-1">Пароль</label>
+          <label className="block text-sm font-semibold text-neutral-800 mb-1.5">Пароль</label>
           <input
             type="password"
             value={password}
             onChange={(e) => setPassword(e.target.value)}
             required
-            className="w-full border border-neutral-200 rounded-lg px-3 py-2 text-sm focus:outline-none focus:border-neutral-400"
+            className="w-full border-2 border-neutral-200 rounded-lg px-3 py-2.5 text-base text-neutral-900 focus:outline-none focus:border-amber-500 transition"
           />
         </div>
         {error && (
-          <div className="text-sm text-red-600 bg-red-50 px-3 py-2 rounded">{error}</div>
+          <div className="text-sm font-medium text-red-700 bg-red-50 border border-red-200 px-3 py-2 rounded-lg">
+            {error}
+          </div>
         )}
         <button
           type="submit"
           disabled={loading}
-          className="w-full bg-amber-500 hover:bg-amber-600 text-white rounded-lg py-2.5 text-sm font-medium disabled:opacity-50"
+          className="w-full bg-amber-500 hover:bg-amber-600 text-white rounded-lg py-3 text-base font-semibold disabled:opacity-50 transition"
         >
           {loading ? 'Входим…' : 'Войти'}
         </button>

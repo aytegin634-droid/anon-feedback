@@ -6,19 +6,16 @@
     -moz-osx-font-smoothing: grayscale;
   }
   body {
-    color: #0a0a0a;        /* почти-чёрный, но не #000 (мягче на глазах) */
-    font-weight: 500;       /* базовый текст слегка плотнее, чем 400 */
-    font-size: 16px;        /* iOS не зумит инпуты при фокусе */
+    color: #0a0a0a;
+    font-feature-settings: "cv02", "cv03", "cv04", "cv11"; /* читаемые варианты глифов Inter */
+    font-size: 16px;
     line-height: 1.5;
   }
   input, textarea, select, button {
     font-family: inherit;
-    font-weight: 500;
   }
-  /* в инпутах текст должен быть чётко тёмный, плейсхолдер — серым */
   input::placeholder, textarea::placeholder {
     color: #a3a3a3;
-    font-weight: 400;
   }
 }
 
