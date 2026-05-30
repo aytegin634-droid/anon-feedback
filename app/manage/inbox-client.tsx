@@ -1,8 +1,8 @@
 'use client'
 
 import Link from 'next/link'
-import { useEffect, useState } from 'react'
-import { useRouter, useSearchParams, usePathname } from 'next/navigation'
+import { useEffect, useState, useCallback } from 'react'
+import { useSearchParams, usePathname } from 'next/navigation'
 import { createClient } from '@/lib/supabase/client'
 
 type Item = {
@@ -18,18 +18,26 @@ type Item = {
 type Filter = 'all' | 'unread' | 'new' | 'in_progress' | 'resolved'
 
 export default function InboxClient({ initial }: { initial: Item[] }) {
-  const router = useRouter()
-  const pathname = usePathname()
   const searchParams = useSearchParams()
-  const filter = ((searchParams.get('filter') as Filter) ?? 'all')
+  const pathname = usePathname()
 
-  const setFilter = (f: Filter) => {
+  // читаем фильтр из URL один раз при монтировании
+  const [filter, setFilterState] = useState<Filter>(() => {
+    const f = searchParams.get('filter')
+    if (f === 'unread' || f === 'new' || f === 'in_progress' || f === 'resolved') return f
+    return 'all'
+  })
+
+  // тихо обновляем URL без триггера Next-навигации
+  const setFilter = useCallback((f: Filter) => {
+    setFilterState(f)
     const params = new URLSearchParams(searchParams.toString())
     if (f === 'all') params.delete('filter')
     else params.set('filter', f)
     const q = params.toString()
-    router.replace(`${pathname}${q ? `?${q}` : ''}`, { scroll: false })
-  }
+    const url = `${pathname}${q ? `?${q}` : ''}`
+    window.history.replaceState(null, '', url)
+  }, [pathname, searchParams])
 
   const [items, setItems] = useState<Item[]>(initial)
 
@@ -63,6 +71,9 @@ export default function InboxClient({ initial }: { initial: Item[] }) {
 
   const unreadCount = items.filter((i) => i.unread_for_manager).length
 
+  // ссылка возврата сохраняет текущий URL вместе с фильтром
+  const returnTo = `${pathname}${filter !== 'all' ? `?filter=${filter}` : ''}`
+
   return (
     <div>
       <div className="bg-white border-b border-neutral-200 px-5 py-2 flex gap-1 overflow-x-auto">
@@ -80,7 +91,7 @@ export default function InboxClient({ initial }: { initial: Item[] }) {
           <div className="text-center text-sm text-neutral-400 py-12">Нет отзывов</div>
         )}
         {filtered.map((item) => (
-          <FeedbackCard key={item.id} item={item} returnTo={`${pathname}${searchParams.toString() ? `?${searchParams.toString()}` : ''}`} />
+          <FeedbackCard key={item.id} item={item} returnTo={returnTo} />
         ))}
       </div>
     </div>
@@ -91,7 +102,7 @@ function FilterTab({ active, onClick, children }: { active: boolean; onClick: ()
   return (
     <button
       onClick={onClick}
-      className={`px-3 py-1.5 rounded-md text-xs whitespace-nowrap ${
+      className={`px-3 py-1.5 rounded-md text-xs whitespace-nowrap transition ${
         active ? 'bg-black text-white' : 'text-neutral-600 hover:bg-neutral-100'
       }`}
     >
@@ -114,6 +125,7 @@ function FeedbackCard({ item, returnTo }: { item: Item; returnTo: string }) {
 
   return (
     <Link
+      prefetch={true}
       href={`/manage/${item.id}?from=${encodeURIComponent(returnTo)}`}
       className={`block bg-white border rounded-lg px-4 py-3 hover:border-neutral-400 transition ${
         item.unread_for_manager ? 'border-blue-300 bg-blue-50/30' : 'border-neutral-200'
