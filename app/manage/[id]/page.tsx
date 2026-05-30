@@ -1,7 +1,6 @@
 import { notFound } from 'next/navigation'
 import { createClient } from '@/lib/supabase/server'
 import ThreadAdminView from './thread-admin-view'
-import { revalidatePath } from 'next/cache'
 
 export default async function AdminThreadPage({
   params,
@@ -47,8 +46,6 @@ export default async function AdminThreadPage({
     .from('feedbacks')
     .update({ unread_for_manager: false })
     .eq('id', id)
-    
-  revalidatePath('/manage')
 
   return (
     <ThreadAdminView

@@ -2,7 +2,7 @@
 
 import Link from 'next/link'
 import { useEffect, useState, useCallback } from 'react'
-import { useSearchParams, usePathname } from 'next/navigation'
+import { useRouter, useSearchParams, usePathname } from 'next/navigation'
 import { createClient } from '@/lib/supabase/client'
 
 type Item = {
@@ -19,7 +19,8 @@ type Filter = 'all' | 'unread' | 'new' | 'in_progress' | 'resolved'
 
 export default function InboxClient({ initial }: { initial: Item[] }) {
   const searchParams = useSearchParams()
-  const pathname = usePathname()
+  const pathname = usePathname()  
+  const router = useRouter()
 
   // читаем фильтр из URL один раз при монтировании
   const [filter, setFilterState] = useState<Filter>(() => {
@@ -62,6 +63,11 @@ export default function InboxClient({ initial }: { initial: Item[] }) {
       supabase.removeChannel(channel)
     }
   }, [])
+
+  // при каждом возврате на инбокс обновляем данные с сервера
+  useEffect(() => {
+    router.refresh()
+  }, [router])
 
   const filtered = items.filter((it) => {
     if (filter === 'all') return true
