@@ -24,19 +24,19 @@ export async function middleware(req: NextRequest) {
 
   const { data: { user } } = await supabase.auth.getUser()
 
-  const isAdminRoute = req.nextUrl.pathname.startsWith('/admin')
-  const isLoginRoute = req.nextUrl.pathname === '/admin/login'
+  const isManageRoute = req.nextUrl.pathname.startsWith('/manage')
+  const isLoginRoute = req.nextUrl.pathname === '/manage/login'
 
-  if (isAdminRoute && !isLoginRoute && !user) {
-    return NextResponse.redirect(new URL('/admin/login', req.url))
+  if (isManageRoute && !isLoginRoute && !user) {
+    return NextResponse.redirect(new URL('/manage/login', req.url))
   }
   if (isLoginRoute && user) {
-    return NextResponse.redirect(new URL('/admin', req.url))
+    return NextResponse.redirect(new URL('/manage', req.url))
   }
 
   return res
 }
 
 export const config = {
-  matcher: ['/admin/:path*'],
+  matcher: ['/manage/:path*'],
 }
