@@ -91,7 +91,19 @@ export default function InboxClient({ initial }: { initial: Item[] }) {
           <div className="text-center text-sm text-neutral-400 py-12">Нет отзывов</div>
         )}
         {filtered.map((item) => (
-          <FeedbackCard key={item.id} item={item} returnTo={returnTo} />
+          <FeedbackCard
+            key={item.id}
+            item={item}
+            returnTo={returnTo}
+            onOpen={() => {
+              // оптимистично помечаем как прочитанное прямо в локальном state
+              setItems((prev) =>
+                prev.map((it) =>
+                  it.id === item.id ? { ...it, unread_for_manager: false } : it
+                )
+              )
+            }}
+          />
         ))}
       </div>
     </div>
@@ -111,7 +123,15 @@ function FilterTab({ active, onClick, children }: { active: boolean; onClick: ()
   )
 }
 
-function FeedbackCard({ item, returnTo }: { item: Item; returnTo: string }) {
+function FeedbackCard({
+  item,
+  returnTo,
+  onOpen,
+}: {
+  item: Item
+  returnTo: string
+  onOpen: () => void
+}) {
   const answers = item.answers
   const numericAnswers = Object.values(answers).filter((v) => typeof v === 'number') as number[]
   const minScore = numericAnswers.length > 0 ? Math.min(...numericAnswers) : null
@@ -126,11 +146,13 @@ function FeedbackCard({ item, returnTo }: { item: Item; returnTo: string }) {
   return (
     <Link
       prefetch={true}
+      onClick={onOpen}
       href={`/manage/${item.id}?from=${encodeURIComponent(returnTo)}`}
       className={`block bg-white border rounded-lg px-4 py-3 hover:border-neutral-400 transition ${
         item.unread_for_manager ? 'border-blue-300 bg-blue-50/30' : 'border-neutral-200'
       }`}
     >
+      {/* ... остальное содержимое карточки как было */}
       <div className="flex items-center justify-between mb-1">
         <div className="flex items-center gap-2">
           {item.unread_for_manager && (
