@@ -6,6 +6,7 @@ import {
   Bar, BarChart, CartesianGrid, Cell, Legend, Line, LineChart,
   Pie, PieChart, ResponsiveContainer, Tooltip, XAxis, YAxis,
 } from 'recharts'
+import ManageHeader from '../manage-header'
 
 type Stats = {
   total: number
@@ -44,37 +45,36 @@ export default function StatsClient() {
 
   return (
     <main className="min-h-screen bg-neutral-50">
-      <header className="bg-white border-b border-neutral-200 px-5 py-3 flex items-center justify-between">
-        <div className="flex items-center gap-4">
-          <Link href="/manage" className="text-sm text-neutral-500 hover:text-neutral-800">
-            ← Инбокс
-          </Link>
-          <h1 className="text-sm font-medium">Статистика</h1>
-        </div>
-        <div className="flex items-center gap-2">
-          <select
-            value={branch}
-            onChange={(e) => setBranch(e.target.value)}
-            className="text-xs border border-neutral-200 rounded px-2 py-1"
-          >
-            <option value="all">Все филиалы</option>
-            <option value="Араванская">Араванская</option>
-            <option value="Дом-Быта">Дом-Быта</option>
-            <option value="Юго-Восток">Юго-Восток</option>
-            <option value="Анар">Анар</option>
-          </select>
-          <select
-            value={period}
-            onChange={(e) => setPeriod(e.target.value)}
-            className="text-xs border border-neutral-200 rounded px-2 py-1"
-          >
-            <option value="7">7 дней</option>
-            <option value="30">30 дней</option>
-            <option value="90">90 дней</option>
-            <option value="all">Всё время</option>
-          </select>
-        </div>
-      </header>
+      <ManageHeader
+        leftLink="/manage"
+        leftLabel="← Инбокс"
+        title="Статистика"
+        right={
+          <>
+            <select
+              value={branch}
+              onChange={(e) => setBranch(e.target.value)}
+              className="text-xs bg-neutral-800 border border-neutral-700 text-white rounded px-2 py-1"
+            >
+              <option value="all">Все филиалы</option>
+              <option value="Араванская">Араванская</option>
+              <option value="Дом-Быта">Дом-Быта</option>
+              <option value="Юго-Восток">Юго-Восток</option>
+              <option value="Анар">Анар</option>
+            </select>
+            <select
+              value={period}
+              onChange={(e) => setPeriod(e.target.value)}
+              className="text-xs bg-neutral-800 border border-neutral-700 text-white rounded px-2 py-1"
+            >
+              <option value="7">7 дней</option>
+              <option value="30">30 дней</option>
+              <option value="90">90 дней</option>
+              <option value="all">Всё время</option>
+            </select>
+          </>
+        }
+      />
 
       <div className="max-w-6xl mx-auto px-4 py-6 space-y-6">
         {loading || !data ? (

@@ -1,5 +1,27 @@
 @import "tailwindcss";
 
+@layer base {
+  html {
+    -webkit-font-smoothing: antialiased;
+    -moz-osx-font-smoothing: grayscale;
+  }
+  body {
+    color: #0a0a0a;        /* почти-чёрный, но не #000 (мягче на глазах) */
+    font-weight: 500;       /* базовый текст слегка плотнее, чем 400 */
+    font-size: 16px;        /* iOS не зумит инпуты при фокусе */
+    line-height: 1.5;
+  }
+  input, textarea, select, button {
+    font-family: inherit;
+    font-weight: 500;
+  }
+  /* в инпутах текст должен быть чётко тёмный, плейсхолдер — серым */
+  input::placeholder, textarea::placeholder {
+    color: #a3a3a3;
+    font-weight: 400;
+  }
+}
+
 :root {
   --background: #ffffff;
   --foreground: #171717;

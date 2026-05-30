@@ -6,6 +6,7 @@ import { useRouter } from 'next/navigation'
 import { createClient } from '@/lib/supabase/client'
 import { Attachment, Feedback, FormField, Message } from '@/lib/types'
 import { useSearchParams } from 'next/navigation'
+import ManageHeader from '../manage-header'
 
 type Template = { id: string; label: string; text: string }
 
@@ -96,21 +97,23 @@ export default function ThreadAdminView({
 
   return (
     <main className="min-h-screen bg-neutral-50">
-      <header className="bg-white border-b border-neutral-200 px-5 py-3 flex items-center justify-between">
-        <BackLink />
-        <div className="flex items-center gap-2">
-          <select
-            value={feedback.status}
-            onChange={(e) => setStatus(e.target.value as Feedback['status'])}
-            className="text-xs border border-neutral-200 rounded px-2 py-1"
-          >
-            <option value="new">Новый</option>
-            <option value="in_progress">В работе</option>
-            <option value="resolved">Закрыт</option>
-            <option value="archived">Архив</option>
-          </select>
-        </div>
-      </header>
+      <ManageHeader
+        right={
+          <>
+            <BackLinkLight />
+            <select
+              value={feedback.status}
+              onChange={(e) => setStatus(e.target.value as Feedback['status'])}
+              className="text-xs bg-neutral-800 border border-neutral-700 text-white rounded px-2 py-1"
+            >
+              <option value="new">Новый</option>
+              <option value="in_progress">В работе</option>
+              <option value="resolved">Закрыт</option>
+              <option value="archived">Архив</option>
+            </select>
+          </>
+        }
+      />
 
       <div className="max-w-6xl mx-auto grid grid-cols-1 md:grid-cols-[1fr_1.2fr] gap-4 p-4">
         {/* Левая колонка: ответы из формы */}
@@ -186,7 +189,7 @@ export default function ThreadAdminView({
             <button
               onClick={send}
               disabled={sending || !text.trim()}
-              className="px-4 py-2 bg-black text-white rounded-lg text-sm disabled:opacity-30"
+              className="px-4 py-2 bg-amber-500 hover:bg-amber-600 text-white rounded-lg text-sm font-medium disabled:opacity-30"
             >
               Отправить
             </button>
@@ -309,6 +312,16 @@ function BackLink() {
   const from = searchParams.get('from') ?? '/manage'
   return (
     <Link href={from} className="text-sm text-neutral-500 hover:text-neutral-800">
+      ← К списку
+    </Link>
+  )
+}
+
+function BackLinkLight() {
+  const searchParams = useSearchParams()
+  const from = searchParams.get('from') ?? '/manage'
+  return (
+    <Link href={from} className="text-sm text-neutral-300 hover:text-white">
       ← К списку
     </Link>
   )

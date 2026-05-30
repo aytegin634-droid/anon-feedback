@@ -29,10 +29,8 @@ export default async function PublicFormPage({
   return (
     <main className="min-h-screen bg-white">
       <div className="mx-auto max-w-xl px-5 py-10">
-        <h1 className="text-2xl font-medium mb-1">{venue.name}</h1>
-        <p className="text-sm text-neutral-500 mb-8">
-          Честно. Коротко. Важно.
-        </p>
+        <h1 className="text-3xl font-bold text-neutral-900 mb-1">{venue.name}</h1>
+        <p className="text-base text-neutral-700 mb-8 font-medium">Честно. Коротко. Важно.</p>
         <FeedbackForm venue={venue} fields={(fields ?? []) as FormField[]} />
       </div>
     </main>

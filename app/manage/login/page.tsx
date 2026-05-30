@@ -59,7 +59,7 @@ export default function AdminLoginPage() {
         <button
           type="submit"
           disabled={loading}
-          className="w-full bg-black text-white rounded-lg py-2.5 text-sm disabled:opacity-50"
+          className="w-full bg-amber-500 hover:bg-amber-600 text-white rounded-lg py-2.5 text-sm font-medium disabled:opacity-50"
         >
           {loading ? 'Входим…' : 'Войти'}
         </button>

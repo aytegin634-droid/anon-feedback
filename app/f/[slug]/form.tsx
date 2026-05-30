@@ -142,18 +142,18 @@ export default function FeedbackForm({
   if (success) return <SuccessModal token={success} />
 
   return (
-    <form onSubmit={handleSubmit} className="space-y-8">
+    <form onSubmit={handleSubmit} className="space-y-7">
       {orderedVisible.map((field) => {
         const idx = indexByRoot.get(field.id)
         const isChild = !!field.parent_field_id
         return (
           <div
             key={field.id}
-            className={`space-y-2 ${isChild ? 'pl-4 border-l-2 border-neutral-200 ml-2' : ''}`}
+            className={`space-y-2.5 ${isChild ? 'pl-4 border-l-2 border-amber-300 ml-1' : ''}`}
           >
-            <label className="block text-sm font-medium">
-              {idx != null && <span className="text-neutral-400 mr-1">{idx}.</span>}
-              {isChild && <span className="text-neutral-400 mr-1">↳</span>}
+            <label className="block text-base font-semibold text-neutral-900 leading-snug">
+              {idx != null && <span className="text-neutral-500 mr-1.5">{idx}.</span>}
+              {isChild && <span className="text-amber-500 mr-1.5">↳</span>}
               {field.label}
               {field.required && <span className="text-red-500 ml-1">*</span>}
             </label>
@@ -163,13 +163,15 @@ export default function FeedbackForm({
       })}
 
       {error && (
-        <div className="text-sm text-red-600 bg-red-50 px-3 py-2 rounded">{error}</div>
+        <div className="text-sm text-red-700 bg-red-50 border border-red-200 px-3 py-2.5 rounded-lg font-medium">
+          {error}
+        </div>
       )}
 
       <button
         type="submit"
         disabled={submitting}
-        className="w-full bg-black text-white rounded-lg py-3 text-sm font-medium disabled:opacity-50"
+        className="w-full bg-neutral-900 text-white rounded-xl py-3.5 text-base font-semibold disabled:opacity-50 hover:bg-neutral-800 transition"
       >
         {submitting ? 'Отправляем…' : 'Пусть узнают, что я думаю'}
       </button>
@@ -202,6 +204,7 @@ function renderField(
   setOther: (id: string, text: string) => void
 ) {
   const v = answers[field.id]
+  const inputCls = "w-full border-2 border-neutral-200 rounded-lg px-3 py-2.5 text-base text-neutral-900 focus:outline-none focus:border-amber-500 transition"
 
   switch (field.field_type) {
     case 'short_text':
@@ -209,52 +212,50 @@ function renderField(
         return <TextWithPhotosField field={field} value={v} setAnswer={setAnswer} multiline={false} />
       }
       return (
-        <input
-          type="text"
-          value={(v as string) ?? ''}
+        <input type="text" value={(v as string) ?? ''}
           onChange={(e) => setAnswer(field.id, e.target.value)}
-          className="w-full border border-neutral-200 rounded-lg px-3 py-2 text-sm focus:outline-none focus:border-neutral-400"
-        />
+          className={inputCls} />
       )
     case 'long_text':
       if (field.allow_photos) {
         return <TextWithPhotosField field={field} value={v} setAnswer={setAnswer} multiline={true} />
       }
       return (
-        <textarea
-          value={(v as string) ?? ''}
+        <textarea value={(v as string) ?? ''}
           onChange={(e) => setAnswer(field.id, e.target.value)}
-          rows={4}
-          className="w-full border border-neutral-200 rounded-lg px-3 py-2 text-sm focus:outline-none focus:border-neutral-400"
-        />
+          rows={4} className={inputCls} />
       )
     case 'date':
       return (
-        <input
-          type="date"
-          value={(v as string) ?? ''}
+        <input type="date" value={(v as string) ?? ''}
           onChange={(e) => setAnswer(field.id, e.target.value)}
-          className="w-full border border-neutral-200 rounded-lg px-3 py-2 text-sm focus:outline-none focus:border-neutral-400"
-        />
+          className={inputCls} />
       )
     case 'select': {
       const isOther = v === OTHER_VALUE
       return (
-        <div className="space-y-1.5">
-          {field.options.map((opt) => (
-            <label key={opt}
-              className="flex items-center gap-2 px-3 py-2 border border-neutral-200 rounded-lg cursor-pointer hover:bg-neutral-50">
-              <input type="radio" name={field.id}
-                checked={v === opt}
-                onChange={() => setAnswer(field.id, opt)} />
-              <span className="text-sm">{opt}</span>
-            </label>
-          ))}
+        <div className="space-y-2">
+          {field.options.map((opt) => {
+            const selected = v === opt
+            return (
+              <label key={opt}
+                className={`flex items-center gap-3 px-4 py-3 border-2 rounded-lg cursor-pointer transition ${
+                  selected
+                    ? 'border-amber-500 bg-amber-50 text-neutral-900'
+                    : 'border-neutral-200 text-neutral-800 hover:border-neutral-300 hover:bg-neutral-50'
+                }`}>
+                <input type="radio" name={field.id} checked={selected}
+                  onChange={() => setAnswer(field.id, opt)}
+                  className="w-4 h-4 accent-amber-500" />
+                <span className="text-base font-medium">{opt}</span>
+              </label>
+            )
+          })}
           {isOther && (
             <input type="text" placeholder="Уточните…"
               value={otherTexts[field.id] ?? ''}
               onChange={(e) => setOther(field.id, e.target.value)}
-              className="w-full border border-neutral-200 rounded-lg px-3 py-2 text-sm focus:outline-none focus:border-neutral-400 mt-1" />
+              className={`${inputCls} mt-1`} />
           )}
         </div>
       )
@@ -263,21 +264,28 @@ function renderField(
       const selected = (v as string[]) ?? []
       const isOther = selected.includes(OTHER_VALUE)
       return (
-        <div className="space-y-1.5">
-          {field.options.map((opt) => (
-            <label key={opt}
-              className="flex items-center gap-2 px-3 py-2 border border-neutral-200 rounded-lg cursor-pointer hover:bg-neutral-50">
-              <input type="checkbox"
-                checked={selected.includes(opt)}
-                onChange={() => toggleMulti(field.id, opt)} />
-              <span className="text-sm">{opt}</span>
-            </label>
-          ))}
+        <div className="space-y-2">
+          {field.options.map((opt) => {
+            const isSelected = selected.includes(opt)
+            return (
+              <label key={opt}
+                className={`flex items-center gap-3 px-4 py-3 border-2 rounded-lg cursor-pointer transition ${
+                  isSelected
+                    ? 'border-amber-500 bg-amber-50 text-neutral-900'
+                    : 'border-neutral-200 text-neutral-800 hover:border-neutral-300 hover:bg-neutral-50'
+                }`}>
+                <input type="checkbox" checked={isSelected}
+                  onChange={() => toggleMulti(field.id, opt)}
+                  className="w-4 h-4 accent-amber-500" />
+                <span className="text-base font-medium">{opt}</span>
+              </label>
+            )
+          })}
           {isOther && (
             <input type="text" placeholder="Уточните…"
               value={otherTexts[field.id] ?? ''}
               onChange={(e) => setOther(field.id, e.target.value)}
-              className="w-full border border-neutral-200 rounded-lg px-3 py-2 text-sm focus:outline-none focus:border-neutral-400 mt-1" />
+              className={`${inputCls} mt-1`} />
           )}
         </div>
       )
@@ -287,16 +295,21 @@ function renderField(
       const max = field.scale_max ?? 10
       const nums = Array.from({ length: max - min + 1 }, (_, i) => i + min)
       return (
-        <div className="flex gap-1 flex-wrap">
-          {nums.map((n) => (
-            <button key={n} type="button"
-              onClick={() => setAnswer(field.id, n)}
-              className={`w-9 h-9 rounded-md border text-sm transition ${
-                v === n ? 'bg-black text-white border-black' : 'border-neutral-200 hover:border-neutral-400'
-              }`}>
-              {n}
-            </button>
-          ))}
+        <div className="flex gap-1.5 flex-wrap">
+          {nums.map((n) => {
+            const selected = v === n
+            return (
+              <button key={n} type="button"
+                onClick={() => setAnswer(field.id, n)}
+                className={`w-10 h-10 rounded-lg border-2 text-base font-semibold transition ${
+                  selected
+                    ? 'bg-amber-500 text-white border-amber-500'
+                    : 'border-neutral-200 text-neutral-700 hover:border-neutral-400'
+                }`}>
+                {n}
+              </button>
+            )
+          })}
         </div>
       )
     }
@@ -322,6 +335,7 @@ function TextWithPhotosField({
   const [uploading, setUploading] = useState(false)
   const [localError, setLocalError] = useState<string | null>(null)
   const fileRef = useRef<HTMLInputElement>(null)
+  const inputCls = "w-full border-2 border-neutral-200 rounded-lg px-3 py-2.5 text-base text-neutral-900 focus:outline-none focus:border-amber-500 transition"
 
   const update = (next: Partial<TextWithPhotos>) => {
     setAnswer(field.id, { text: data.text, photos: data.photos, ...next })
@@ -359,59 +373,42 @@ function TextWithPhotosField({
   }
 
   return (
-    <div className="space-y-2">
+    <div className="space-y-2.5">
       {multiline ? (
-        <textarea
-          value={data.text}
+        <textarea value={data.text}
           onChange={(e) => update({ text: e.target.value })}
-          rows={4}
-          className="w-full border border-neutral-200 rounded-lg px-3 py-2 text-sm focus:outline-none focus:border-neutral-400"
-        />
+          rows={4} className={inputCls} />
       ) : (
-        <input
-          type="text"
-          value={data.text}
+        <input type="text" value={data.text}
           onChange={(e) => update({ text: e.target.value })}
-          className="w-full border border-neutral-200 rounded-lg px-3 py-2 text-sm focus:outline-none focus:border-neutral-400"
-        />
+          className={inputCls} />
       )}
 
-      <input
-        type="file"
-        accept="image/*"
-        ref={fileRef}
-        className="hidden"
+      <input type="file" accept="image/*" ref={fileRef} className="hidden"
         onChange={(e) => {
           const f = e.target.files?.[0]
           if (f) onFile(f)
           if (e.target) e.target.value = ''
-        }}
-      />
+        }} />
 
       <div className="flex items-center gap-2 flex-wrap">
-        <button
-          type="button"
-          onClick={() => fileRef.current?.click()}
+        <button type="button" onClick={() => fileRef.current?.click()}
           disabled={uploading || data.photos.length >= MAX_FORM_PHOTOS}
-          className="text-xs text-neutral-600 border border-neutral-200 rounded-md px-3 py-1.5 hover:bg-neutral-50 disabled:opacity-30"
-        >
-          {uploading ? 'Загрузка…' : `📎 Прикрепить фото (${data.photos.length}/${MAX_FORM_PHOTOS})`}
+          className="text-sm font-medium text-neutral-800 border-2 border-neutral-200 rounded-lg px-3 py-2 hover:border-amber-400 hover:bg-amber-50 disabled:opacity-30 transition">
+          {uploading ? 'Загрузка…' : `📎 Фото (${data.photos.length}/${MAX_FORM_PHOTOS})`}
         </button>
         {data.photos.map((p, i) => (
           <div key={i} className="relative">
-            <img src={p.url} alt="" className="w-14 h-14 object-cover rounded" />
-            <button
-              type="button"
-              onClick={() => removePhoto(i)}
-              className="absolute -top-1 -right-1 w-5 h-5 bg-black text-white rounded-full text-xs flex items-center justify-center"
-            >
+            <img src={p.url} alt="" className="w-14 h-14 object-cover rounded-lg" />
+            <button type="button" onClick={() => removePhoto(i)}
+              className="absolute -top-1.5 -right-1.5 w-5 h-5 bg-neutral-900 text-white rounded-full text-xs flex items-center justify-center font-bold">
               ×
             </button>
           </div>
         ))}
       </div>
 
-      {localError && <div className="text-xs text-red-600">{localError}</div>}
+      {localError && <div className="text-sm text-red-700 font-medium">{localError}</div>}
     </div>
   )
 }
@@ -420,16 +417,16 @@ function SuccessModal({ token }: { token: string }) {
   const router = useRouter()
   return (
     <div className="flex flex-col items-center text-center py-12">
-      <div className="w-14 h-14 rounded-full bg-green-100 flex items-center justify-center mb-5">
-        <svg className="w-7 h-7 text-green-600" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5">
+      <div className="w-16 h-16 rounded-full bg-amber-100 flex items-center justify-center mb-5">
+        <svg className="w-8 h-8 text-amber-600" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5">
           <path strokeLinecap="round" strokeLinejoin="round" d="M5 13l4 4L19 7" />
         </svg>
       </div>
-      <h2 className="text-xl font-medium mb-2">Спасибо за отзыв!</h2>
-      <p className="text-sm text-neutral-500 mb-8 max-w-xs">
+      <h2 className="text-xl font-bold text-neutral-900 mb-2">Спасибо за отзыв!</h2>
+      <p className="text-base text-neutral-700 mb-8 max-w-xs">
         Сейчас откроется чат, где менеджер сможет связаться с вами анонимно.
       </p>
-      <button onClick={() => router.push(`/t/${token}`)} className="text-sm text-neutral-600 underline">
+      <button onClick={() => router.push(`/t/${token}`)} className="text-base text-neutral-700 underline font-medium">
         Перейти сейчас
       </button>
     </div>

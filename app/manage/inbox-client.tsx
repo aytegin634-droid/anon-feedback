@@ -121,7 +121,7 @@ function FilterTab({ active, onClick, children }: { active: boolean; onClick: ()
     <button
       onClick={onClick}
       className={`px-3 py-1.5 rounded-md text-xs whitespace-nowrap transition ${
-        active ? 'bg-black text-white' : 'text-neutral-600 hover:bg-neutral-100'
+        active ? 'bg-neutral-900 text-white font-medium' : 'text-neutral-600 hover:bg-neutral-100'
       }`}
     >
       {children}
