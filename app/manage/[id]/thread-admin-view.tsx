@@ -97,23 +97,19 @@ export default function ThreadAdminView({
 
   return (
     <main className="min-h-screen bg-neutral-50">
-      <ManageHeader
-        right={
-          <>
-            <BackLinkLight />
-            <select
-              value={feedback.status}
-              onChange={(e) => setStatus(e.target.value as Feedback['status'])}
-              className="text-xs bg-neutral-800 border border-neutral-700 text-white rounded px-2 py-1"
-            >
-              <option value="new">Новый</option>
-              <option value="in_progress">В работе</option>
-              <option value="resolved">Закрыт</option>
-              <option value="archived">Архив</option>
-            </select>
-          </>
-        }
-      />
+      <div className="bg-white border-b border-neutral-200 px-5 py-3 pl-16 md:pl-5 flex items-center justify-between gap-3">
+        <BackLink />
+        <select
+          value={feedback.status}
+          onChange={(e) => setStatus(e.target.value as Feedback['status'])}
+          className="text-sm border-2 border-neutral-200 rounded-lg px-3 py-1.5 text-neutral-900 font-medium"
+        >
+          <option value="new">Новый</option>
+          <option value="in_progress">В работе</option>
+          <option value="resolved">Закрыт</option>
+          <option value="archived">Архив</option>
+        </select>
+      </div>
 
       <div className="max-w-6xl mx-auto grid grid-cols-1 md:grid-cols-[1fr_1.2fr] gap-4 p-4">
         {/* Левая колонка: ответы из формы */}
@@ -312,16 +308,6 @@ function BackLink() {
   const from = searchParams.get('from') ?? '/manage'
   return (
     <Link href={from} className="text-sm text-neutral-500 hover:text-neutral-800">
-      ← К списку
-    </Link>
-  )
-}
-
-function BackLinkLight() {
-  const searchParams = useSearchParams()
-  const from = searchParams.get('from') ?? '/manage'
-  return (
-    <Link href={from} className="text-sm text-neutral-300 hover:text-white">
       ← К списку
     </Link>
   )

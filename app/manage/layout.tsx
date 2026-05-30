@@ -1,5 +1,6 @@
 import type { Metadata, Viewport } from 'next'
 import PWAInstallPrompt from './pwa-install-prompt'
+import ManageSidebar from './manage-header'
 
 export const metadata: Metadata = {
   title: 'Borsok — менеджер',
@@ -20,9 +21,12 @@ export const viewport: Viewport = {
 
 export default function ManageLayout({ children }: { children: React.ReactNode }) {
   return (
-    <>
-      {children}
+    <div className="md:flex min-h-screen bg-neutral-50">
+      <ManageSidebar />
+      <main className="flex-1 min-w-0">
+        {children}
+      </main>
       <PWAInstallPrompt />
-    </>
+    </div>
   )
 }

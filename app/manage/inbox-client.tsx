@@ -94,7 +94,7 @@ export default function InboxClient({ initial }: { initial: Item[] }) {
 
       <div className="max-w-3xl mx-auto px-3 py-3 space-y-2">
         {filtered.length === 0 && (
-          <div className="text-center text-sm text-neutral-400 py-12">Нет отзывов</div>
+          <div className="text-center text-sm text-neutral-600 py-12">Нет отзывов</div>
         )}
         {filtered.map((item) => (
           <FeedbackCard
@@ -176,9 +176,9 @@ function FeedbackCard({
           )}
           <StatusBadge status={item.status} />
         </div>
-        <span className="text-xs text-neutral-400">{time}</span>
+        <span className="text-sm font-medium text-neutral-700">{time}</span>
       </div>
-      <div className="text-xs text-neutral-500 font-mono">#{item.anonymous_token.slice(0, 7)}</div>
+      <div className="text-xs text-neutral-700 font-mono">#{item.anonymous_token.slice(0, 7)}</div>
     </Link>
   )
 }
@@ -188,7 +188,7 @@ function StatusBadge({ status }: { status: Item['status'] }) {
     new: { label: 'Новый', cls: 'bg-neutral-100 text-neutral-600' },
     in_progress: { label: 'В работе', cls: 'bg-blue-100 text-blue-700' },
     resolved: { label: 'Закрыт', cls: 'bg-green-100 text-green-700' },
-    archived: { label: 'Архив', cls: 'bg-neutral-100 text-neutral-400' },
+    archived: { label: 'Архив', cls: 'bg-neutral-100 text-neutral-600' },
   }
   const { label, cls } = map[status]
   return <span className={`text-xs px-2 py-0.5 rounded ${cls}`}>{label}</span>

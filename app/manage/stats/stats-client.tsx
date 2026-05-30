@@ -45,42 +45,38 @@ export default function StatsClient() {
 
   return (
     <main className="min-h-screen bg-neutral-50">
-      <ManageHeader
-        leftLink="/manage"
-        leftLabel="← Инбокс"
-        title="Статистика"
-        right={
-          <>
-            <select
-              value={branch}
-              onChange={(e) => setBranch(e.target.value)}
-              className="text-xs bg-neutral-800 border border-neutral-700 text-white rounded px-2 py-1"
-            >
-              <option value="all">Все филиалы</option>
-              <option value="Араванская">Араванская</option>
-              <option value="Дом-Быта">Дом-Быта</option>
-              <option value="Юго-Восток">Юго-Восток</option>
-              <option value="Анар">Анар</option>
-            </select>
-            <select
-              value={period}
-              onChange={(e) => setPeriod(e.target.value)}
-              className="text-xs bg-neutral-800 border border-neutral-700 text-white rounded px-2 py-1"
-            >
-              <option value="7">7 дней</option>
-              <option value="30">30 дней</option>
-              <option value="90">90 дней</option>
-              <option value="all">Всё время</option>
-            </select>
-          </>
-        }
-      />
+      <div className="bg-white border-b border-neutral-200 px-5 py-3 pl-16 md:pl-5 flex items-center justify-between gap-3 flex-wrap">
+        <h1 className="text-xl font-bold text-neutral-900">Статистика</h1>
+        <div className="flex items-center gap-2 flex-wrap">
+          <select
+            value={branch}
+            onChange={(e) => setBranch(e.target.value)}
+            className="text-sm border-2 border-neutral-200 rounded-lg px-3 py-1.5 text-neutral-900 font-medium"
+          >
+            <option value="all">Все филиалы</option>
+            <option value="Араванская">Араванская</option>
+            <option value="Дом-Быта">Дом-Быта</option>
+            <option value="Юго-Восток">Юго-Восток</option>
+            <option value="Анар">Анар</option>
+          </select>
+          <select
+            value={period}
+            onChange={(e) => setPeriod(e.target.value)}
+            className="text-sm border-2 border-neutral-200 rounded-lg px-3 py-1.5 text-neutral-900 font-medium"
+          >
+            <option value="7">7 дней</option>
+            <option value="30">30 дней</option>
+            <option value="90">90 дней</option>
+            <option value="all">Всё время</option>
+          </select>
+        </div>
+      </div>
 
       <div className="max-w-6xl mx-auto px-4 py-6 space-y-6">
         {loading || !data ? (
-          <div className="text-center text-sm text-neutral-400 py-20">Загружаем…</div>
+          <div className="text-center text-sm text-neutral-600 py-20">Загружаем…</div>
         ) : data.total === 0 ? (
-          <div className="text-center text-sm text-neutral-400 py-20">
+          <div className="text-center text-sm text-neutral-600 py-20">
             За выбранный период нет отзывов
           </div>
         ) : (
@@ -188,7 +184,7 @@ export default function StatsClient() {
                           style={{ background: BRANCH_COLORS[i % BRANCH_COLORS.length] }}
                         />
                         <span className="flex-1">{b.branch}</span>
-                        <span className="text-neutral-500 font-mono">{b.count}</span>
+                        <span className="text-neutral-700 font-mono">{b.count}</span>
                       </div>
                     ))}
                   </div>
@@ -241,10 +237,10 @@ function Tile({
 }) {
   return (
     <div className="bg-white border border-neutral-200 rounded-lg p-4">
-      <div className="text-xs text-neutral-500 mb-1">{label}</div>
+      <div className="text-xs text-neutral-700 mb-1">{label}</div>
       <div className="text-2xl font-medium" style={color ? { color } : undefined}>
         {value}
-        {suffix && <span className="text-base text-neutral-400 font-normal">{suffix}</span>}
+        {suffix && <span className="text-base text-neutral-600 font-normal">{suffix}</span>}
       </div>
     </div>
   )
@@ -263,7 +259,7 @@ function Card({
     <div className="bg-white border border-neutral-200 rounded-lg p-4">
       <div className="flex items-baseline justify-between mb-3">
         <h2 className="text-sm font-medium">{title}</h2>
-        {subtitle && <span className="text-xs text-neutral-400">{subtitle}</span>}
+        {subtitle && <span className="text-sm font-medium text-neutral-700">{subtitle}</span>}
       </div>
       {children}
     </div>
@@ -290,7 +286,7 @@ function ScoreHistogram({ data }: { data: { score: number; count: number }[] }) 
 
 function RankedList({ items }: { items: { option: string; count: number }[] }) {
   if (items.length === 0) {
-    return <div className="text-xs text-neutral-400 py-2">Нет данных</div>
+    return <div className="text-sm font-medium text-neutral-700 py-2">Нет данных</div>
   }
   const max = Math.max(...items.map((i) => i.count))
   return (
@@ -299,7 +295,7 @@ function RankedList({ items }: { items: { option: string; count: number }[] }) {
         <div key={item.option} className="text-sm">
           <div className="flex justify-between mb-1">
             <span className="text-neutral-700 truncate pr-2">{item.option}</span>
-            <span className="text-neutral-500 font-mono text-xs">{item.count}</span>
+            <span className="text-neutral-700 font-mono text-xs">{item.count}</span>
           </div>
           <div className="h-1.5 bg-neutral-100 rounded">
             <div
@@ -316,7 +312,7 @@ function RankedList({ items }: { items: { option: string; count: number }[] }) {
 function ComplaintList({ items }: { items: { text: string; feedbackId: string; date: string }[] }) {
   const [expanded, setExpanded] = useState(false)
   if (items.length === 0) {
-    return <div className="text-xs text-neutral-400 py-2">Нет жалоб — хорошо</div>
+    return <div className="text-sm font-medium text-neutral-700 py-2">Нет жалоб — хорошо</div>
   }
   const visible = expanded ? items : items.slice(0, 3)
   return (
@@ -327,7 +323,7 @@ function ComplaintList({ items }: { items: { text: string; feedbackId: string; d
           href={`/admin/${item.feedbackId}`}
           className="block border-l-2 border-red-200 pl-3 py-1 hover:bg-neutral-50 -mx-2 px-2"
         >
-          <div className="text-xs text-neutral-400 mb-0.5">
+          <div className="text-sm font-medium text-neutral-700 mb-0.5">
             {new Date(item.date).toLocaleDateString('ru-RU')}
           </div>
           <div className="text-sm text-neutral-800 line-clamp-3 whitespace-pre-wrap">
@@ -338,7 +334,7 @@ function ComplaintList({ items }: { items: { text: string; feedbackId: string; d
       {items.length > 3 && (
         <button
           onClick={() => setExpanded((v) => !v)}
-          className="text-xs text-neutral-500 hover:underline"
+          className="text-xs text-neutral-700 hover:underline"
         >
           {expanded ? 'Скрыть' : `Показать ещё ${items.length - 3}`}
         </button>

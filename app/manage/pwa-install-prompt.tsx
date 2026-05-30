@@ -66,7 +66,7 @@ export default function PWAInstallPrompt() {
         </div>
         <div className="flex-1 min-w-0">
           <div className="text-sm font-medium">Установить приложение</div>
-          <div className="text-xs text-neutral-500">Быстрый доступ с главного экрана</div>
+          <div className="text-xs text-neutral-700">Быстрый доступ с главного экрана</div>
         </div>
         <button
           onClick={installAndroid}
@@ -74,7 +74,7 @@ export default function PWAInstallPrompt() {
         >
           Установить
         </button>
-        <button onClick={dismiss} className="text-neutral-400 hover:text-neutral-700 text-lg leading-none">
+        <button onClick={dismiss} className="text-neutral-600 hover:text-neutral-700 text-lg leading-none">
           ×
         </button>
       </div>
@@ -93,14 +93,14 @@ export default function PWAInstallPrompt() {
           </div>
           <div className="flex-1 min-w-0">
             <div className="text-sm font-medium">Добавить на главный экран</div>
-            <div className="text-xs text-neutral-500">Показать как</div>
+            <div className="text-xs text-neutral-700">Показать как</div>
           </div>
           <span
             onClick={(e) => {
               e.stopPropagation()
               dismiss()
             }}
-            className="text-neutral-400 hover:text-neutral-700 text-lg leading-none px-2"
+            className="text-neutral-600 hover:text-neutral-700 text-lg leading-none px-2"
           >
             ×
           </span>
@@ -125,7 +125,7 @@ function IOSInstallModal({ onClose, onDismiss }: { onClose: () => void; onDismis
       >
         <div className="flex items-center justify-between mb-4">
           <h2 className="text-base font-medium">Добавить на главный экран</h2>
-          <button onClick={onClose} className="text-neutral-400 text-2xl leading-none">×</button>
+          <button onClick={onClose} className="text-neutral-600 text-2xl leading-none">×</button>
         </div>
 
         <ol className="space-y-3 text-sm text-neutral-700">
@@ -153,7 +153,7 @@ function IOSInstallModal({ onClose, onDismiss }: { onClose: () => void; onDismis
           <button onClick={onClose} className="flex-1 border border-neutral-200 rounded-lg py-2 text-sm">
             Понятно
           </button>
-          <button onClick={onDismiss} className="text-xs text-neutral-400 px-3">
+          <button onClick={onDismiss} className="text-sm font-medium text-neutral-700 px-3">
             Больше не показывать
           </button>
         </div>

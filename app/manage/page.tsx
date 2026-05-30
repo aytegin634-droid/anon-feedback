@@ -13,23 +13,13 @@ export default async function AdminInboxPage() {
     .limit(100)
 
   return (
-    <main className="min-h-screen bg-neutral-50">
-      <ManageHeader
-        title="Отзывы"
-        right={
-          <>
-            <Link href="/manage/stats" className="text-xs text-neutral-300 hover:text-white">
-              📊 Статистика
-            </Link>
-            <form action="/manage/logout" method="post">
-              <button className="text-xs text-neutral-300 hover:text-white">Выйти</button>
-            </form>
-          </>
-        }
-      />
+    <div>
+      <div className="bg-white border-b border-neutral-200 px-5 py-4 pl-16 md:pl-5">
+        <h1 className="text-xl font-bold text-neutral-900">Отзывы</h1>
+      </div>
       <Suspense>
         <InboxClient initial={feedbacks ?? []} />
       </Suspense>
-    </main>
+    </div> 
   )
 }
