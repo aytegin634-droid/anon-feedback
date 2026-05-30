@@ -2,6 +2,8 @@ import { notFound } from 'next/navigation'
 import { createClient } from '@/lib/supabase/server'
 import ThreadAdminView from './thread-admin-view'
 
+export const dynamic = 'force-dynamic'
+
 export default async function AdminThreadPage({
   params,
 }: {
