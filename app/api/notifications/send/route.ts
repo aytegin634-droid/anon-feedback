@@ -57,7 +57,7 @@ async function notifyNewFeedback(feedback: Record<string, unknown>) {
 
   const branch = findBranch(answers)
   const minScore = findMinScore(answers)
-  const adminUrl = `${process.env.NEXT_PUBLIC_SITE_URL}/admin/${feedbackId}`
+  const adminUrl = `${process.env.NEXT_PUBLIC_SITE_URL}/manage/${feedbackId}`
 
   const html = renderNewFeedbackEmail({
     venueName: venue?.name ?? 'Заведение',
@@ -102,7 +102,7 @@ async function notifyGuestMessage(message: Record<string, unknown>) {
     .single()
 
   const branch = findBranch(feedback.answers as Record<string, unknown>)
-  const adminUrl = `${process.env.NEXT_PUBLIC_SITE_URL}/admin/${feedbackId}`
+  const adminUrl = `${process.env.NEXT_PUBLIC_SITE_URL}/manage/${feedbackId}`
 
   const html = renderGuestMessageEmail({
     venueName: venue?.name ?? 'Заведение',

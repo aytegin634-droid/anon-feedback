@@ -306,7 +306,7 @@ function AdminMessageBubble({ message }: { message: Message }) {
 
 function BackLink() {
   const searchParams = useSearchParams()
-  const from = searchParams.get('from') ?? '/admin'
+  const from = searchParams.get('from') ?? '/manage'
   return (
     <Link href={from} className="text-sm text-neutral-500 hover:text-neutral-800">
       ← К списку

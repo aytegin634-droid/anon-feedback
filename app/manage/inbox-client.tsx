@@ -114,7 +114,7 @@ function FeedbackCard({ item, returnTo }: { item: Item; returnTo: string }) {
 
   return (
     <Link
-      href={`/admin/${item.id}?from=${encodeURIComponent(returnTo)}`}
+      href={`/manage/${item.id}?from=${encodeURIComponent(returnTo)}`}
       className={`block bg-white border rounded-lg px-4 py-3 hover:border-neutral-400 transition ${
         item.unread_for_manager ? 'border-blue-300 bg-blue-50/30' : 'border-neutral-200'
       }`}

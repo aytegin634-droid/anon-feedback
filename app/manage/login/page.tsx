@@ -22,7 +22,7 @@ export default function AdminLoginPage() {
       setLoading(false)
       return
     }
-    router.push('/admin')
+    router.push('/manage')
     router.refresh()
   }
 

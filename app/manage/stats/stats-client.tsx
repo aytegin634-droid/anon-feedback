@@ -34,7 +34,7 @@ export default function StatsClient() {
 
   useEffect(() => {
     setLoading(true)
-    fetch(`/api/admin/stats?period=${period}&branch=${encodeURIComponent(branch)}`)
+    fetch(`/api/manage/stats?period=${period}&branch=${encodeURIComponent(branch)}`)
       .then((r) => r.json())
       .then((d) => {
         setData(d)
@@ -46,7 +46,7 @@ export default function StatsClient() {
     <main className="min-h-screen bg-neutral-50">
       <header className="bg-white border-b border-neutral-200 px-5 py-3 flex items-center justify-between">
         <div className="flex items-center gap-4">
-          <Link href="/admin" className="text-sm text-neutral-500 hover:text-neutral-800">
+          <Link href="/manage" className="text-sm text-neutral-500 hover:text-neutral-800">
             ← Инбокс
           </Link>
           <h1 className="text-sm font-medium">Статистика</h1>
