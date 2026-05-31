@@ -22,8 +22,9 @@ export default function AdminLoginPage() {
       setLoading(false)
       return
     }
-    router.push('/manage')
-    router.refresh()
+    // полная перезагрузка гарантирует, что cookie сессии уже установлен
+    // при следующем запросе и middleware его увидит
+    window.location.href = '/manage'
   }
 
   return (
