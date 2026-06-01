@@ -114,6 +114,15 @@ export default function ThreadAdminView({
       <div className="max-w-6xl mx-auto grid grid-cols-1 md:grid-cols-[1fr_1.2fr] gap-4 p-4">
         {/* Левая колонка: ответы из формы */}
         <div className="bg-white border border-neutral-200 rounded-lg p-4 space-y-4 h-fit">
+          {feedback.guest_name && (
+            <div className="flex items-center gap-2 bg-amber-50 border border-amber-200 rounded-lg px-3 py-2 -mt-1">
+              <span className="text-base">👤</span>
+              <div>
+                <div className="text-xs text-amber-700 font-medium">Гость представился</div>
+                <div className="text-sm font-semibold text-neutral-900">{feedback.guest_name}</div>
+              </div>
+            </div>
+          )}
           <div>
             <div className="text-xs text-neutral-400 mb-1">Заведение</div>
             <div className="text-sm font-medium">{venue.name}</div>
@@ -131,16 +140,11 @@ export default function ThreadAdminView({
 
           <div className="space-y-3">
             {fields
-              .filter((f) => !f.parent_field_id)
-              .sort((a, b) => a.position - b.position)
-              .map((root) => (
-                <AnswerBlock
-                  key={root.id}
-                  field={root}
-                  answers={feedback.answers}
-                  fields={fields}
-                />
-              ))}
+            .filter((f) => !f.parent_field_id && f.field_key !== 'guest_name')
+            .sort((a, b) => a.position - b.position)
+            .map((root) => (
+              <AnswerBlock key={root.id} field={root} answers={feedback.answers} fields={fields} />
+            ))}
           </div>
         </div>
 

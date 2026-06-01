@@ -21,6 +21,7 @@ export type FormField = {
   parent_field_id: string | null
   show_when: ShowWhen | null
   allow_photos: boolean
+  field_key: string | null   // ← добавить
 }
 
 export type Venue = {
@@ -56,4 +57,5 @@ export type Feedback = {
   last_message_at: string
   unread_for_manager: boolean
   unread_for_guest: boolean
+  guest_name: string | null   // ← добавить
 }

@@ -21,9 +21,25 @@ export async function POST(req: Request) {
 
     const supabase = createAdminClient()
 
+    // находим поле имени по семантическому ключу и достаём значение
+    const { data: nameField } = await supabase
+      .from('form_fields')
+      .select('id')
+      .eq('venue_id', venue_id)
+      .eq('field_key', 'guest_name')
+      .maybeSingle()
+
+    let guestName: string | null = null
+    if (nameField) {
+      const v = answers[nameField.id]
+      if (typeof v === 'string' && v.trim()) {
+        guestName = v.trim().slice(0, 100)
+      }
+    }
+
     const { data: feedback, error } = await supabase
       .from('feedbacks')
-      .insert({ venue_id, answers })
+      .insert({ venue_id, answers, guest_name: guestName })
       .select('id, anonymous_token')
       .single()
 

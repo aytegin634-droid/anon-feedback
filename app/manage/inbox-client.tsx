@@ -13,6 +13,7 @@ type Item = {
   created_at: string
   last_message_at: string
   unread_for_manager: boolean
+  guest_name: string | null   // ← добавить
 }
 
 type Filter = 'all' | 'unread' | 'new' | 'in_progress' | 'resolved'
@@ -52,7 +53,7 @@ export default function InboxClient({ initial }: { initial: Item[] }) {
         async () => {
           const { data } = await supabase
             .from('feedbacks')
-            .select('id, anonymous_token, answers, status, created_at, last_message_at, unread_for_manager')
+            .select('id, anonymous_token, answers, status, created_at, last_message_at, unread_for_manager, guest_name')
             .order('last_message_at', { ascending: false })
             .limit(100)
           if (data) setItems(data as Item[])
@@ -164,7 +165,9 @@ function FeedbackCard({
           {item.unread_for_manager && (
             <span className="w-2 h-2 rounded-full bg-blue-500" />
           )}
-          <span className="text-sm font-medium">{branch ?? 'Без филиала'}</span>
+          <span className="text-sm font-medium">
+            {item.guest_name ? `${item.guest_name} · ` : ''}{branch ?? 'Без филиала'}
+          </span>
           {minScore != null && (
             <span className={`text-xs px-2 py-0.5 rounded ${
               minScore <= 6 ? 'bg-red-100 text-red-700' :

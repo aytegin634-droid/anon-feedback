@@ -8,7 +8,7 @@ export default async function AdminInboxPage() {
   const supabase = await createClient()
   const { data: feedbacks } = await supabase
     .from('feedbacks')
-    .select('id, anonymous_token, answers, status, created_at, last_message_at, unread_for_manager')
+    .select('id, anonymous_token, answers, status, created_at, last_message_at, unread_for_manager, guest_name')
     .order('last_message_at', { ascending: false })
     .limit(100)
 

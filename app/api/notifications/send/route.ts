@@ -56,23 +56,28 @@ async function notifyNewFeedback(feedback: Record<string, unknown>) {
   ])
 
   const branch = findBranch(answers)
-  const minScore = findMinScore(answers)
+  const scores = collectScores(answers, fields ?? [])
+  const worst = worstScore(scores)
   const adminUrl = `${process.env.NEXT_PUBLIC_SITE_URL}/manage/${feedbackId}`
 
   const html = renderNewFeedbackEmail({
     venueName: venue?.name ?? 'Заведение',
     branch,
-    minScore,
+    worst,
     answers,
     fields: fields ?? [],
     adminUrl,
     token,
+    guestName: (feedback.guest_name as string | null) ?? null,
   })
 
-  const subject =
-    minScore != null && minScore <= 6
-      ? `🔴 Низкая оценка ${minScore}/10 — ${branch ?? venue?.name ?? 'отзыв'}`
-      : `Новый отзыв — ${branch ?? venue?.name ?? 'заведение'}`
+  const subject = (() => {
+    if (!worst) return `Новый отзыв — ${branch ?? venue?.name ?? 'заведение'}`
+    const place = branch ?? venue?.name ?? 'отзыв'
+    if (worst.value <= 6) return `🔴 ${shortenLabel(worst.label)} ${worst.value}/10 — ${place}`
+    if (worst.value <= 8) return `🟡 ${shortenLabel(worst.label)} ${worst.value}/10 — ${place}`
+    return `Новый отзыв ${worst.value}/10 — ${place}`
+  })()
 
   await resend.emails.send({
     from: process.env.NOTIFICATION_FROM_EMAIL!,
@@ -123,6 +128,33 @@ async function notifyGuestMessage(message: Record<string, unknown>) {
 
 // === вспомогательные ===
 
+type ScoredField = { label: string; value: number }
+
+function collectScores(
+  answers: Record<string, unknown>,
+  fields: { id: string; label: string; field_type: string }[]
+): ScoredField[] {
+  const scores: ScoredField[] = []
+  for (const f of fields) {
+    if (f.field_type !== 'scale') continue
+    const v = answers[f.id]
+    if (typeof v === 'number') {
+      scores.push({ label: f.label, value: v })
+    }
+  }
+  return scores
+}
+
+function worstScore(scores: ScoredField[]): ScoredField | null {
+  if (scores.length === 0) return null
+  return scores.reduce((acc, cur) => (cur.value < acc.value ? cur : acc))
+}
+
+function shortenLabel(label: string): string {
+  // "Оцените обслуживание" → "обслуживание"
+  return label.replace(/^Оцените\s+/i, '').toLowerCase()
+}
+
 function findBranch(answers: Record<string, unknown>): string | null {
   const branches = ['Араванская', 'Дом-Быта', 'Юго-Восток', 'Анар']
   for (const v of Object.values(answers)) {
@@ -168,11 +200,12 @@ function scoreColor(score: number): string {
 function renderNewFeedbackEmail(p: {
   venueName: string
   branch: string | null
-  minScore: number | null
+  worst: ScoredField | null
   answers: Record<string, unknown>
   fields: { id: string; label: string; field_type: string; parent_field_id: string | null }[]
   adminUrl: string
   token: string
+  guestName: string | null
 }): string {
   const rootFields = p.fields.filter((f) => !f.parent_field_id)
   const answerRows = rootFields
@@ -184,7 +217,6 @@ function renderNewFeedbackEmail(p: {
         const color = scoreColor(value)
         valueHtml = `<span style="color:${color};font-weight:600">${value}/10</span>`
       }
-      // если есть условный ребёнок с ответом, дописываем под главным
       const children = p.fields.filter((c) => c.parent_field_id === f.id)
       const childAnswers = children
         .filter((c) => p.answers[c.id] != null && p.answers[c.id] !== '')
@@ -206,21 +238,25 @@ function renderNewFeedbackEmail(p: {
     })
     .join('')
 
-  const scoreBadge =
-    p.minScore != null
-      ? `<span style="display:inline-block;background:${scoreColor(p.minScore)};color:white;padding:4px 10px;border-radius:6px;font-size:13px;font-weight:600;margin-left:8px">${p.minScore}/10</span>`
-      : ''
+  const headerBadge = p.worst
+    ? `<div style="margin-top:6px;font-size:13px;color:#737373">
+         Худшая оценка:
+         <span style="color:${scoreColor(p.worst.value)};font-weight:600">${escapeHtml(p.worst.label)} — ${p.worst.value}/10</span>
+       </div>`
+    : ''
 
   return `<!DOCTYPE html>
 <html><body style="margin:0;padding:0;background:#f5f5f5;font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif">
   <div style="max-width:560px;margin:0 auto;padding:20px">
     <div style="background:white;border-radius:12px;padding:24px;border:1px solid #e5e5e5">
-      <h1 style="margin:0 0 4px;font-size:18px;color:#171717">Новый отзыв ${scoreBadge}</h1>
-      <p style="margin:0 0 20px;font-size:14px;color:#737373">
+      <h1 style="margin:0 0 4px;font-size:18px;color:#171717">Новый отзыв</h1>
+      <p style="margin:0 0 4px;font-size:14px;color:#737373">
         ${escapeHtml(p.venueName)}${p.branch ? ` · ${escapeHtml(p.branch)}` : ''}
       </p>
+      ${p.guestName ? `<p style="margin:0 0 4px;font-size:14px;color:#171717"><strong>👤 ${escapeHtml(p.guestName)}</strong></p>` : ''}
+      ${headerBadge}
 
-      <table style="width:100%;border-collapse:collapse">${answerRows}</table>
+      <table style="width:100%;border-collapse:collapse;margin-top:16px">${answerRows}</table>
 
       <a href="${p.adminUrl}" style="display:inline-block;margin-top:24px;background:#171717;color:white;text-decoration:none;padding:12px 20px;border-radius:8px;font-size:14px;font-weight:500">
         Ответить гостю
