@@ -3,7 +3,7 @@ import { createClient } from '@/lib/supabase/server'
 
 const VENUE_ID = '00000000-0000-0000-0000-000000000001'
 const MAX_LABEL = 30
-const MAX_TEXT = 500
+const MAX_TEXT = 2000
 
 async function requireAuth() {
   const supabase = await createClient()
@@ -21,6 +21,7 @@ export async function GET() {
     .from('message_templates')
     .select('id, label, text, position, created_at')
     .eq('venue_id', VENUE_ID)
+    .is('auto_type', null)
     .order('position', { ascending: true })
 
   if (error) return NextResponse.json({ error: error.message }, { status: 500 })

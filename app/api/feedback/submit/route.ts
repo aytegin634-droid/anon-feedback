@@ -58,11 +58,49 @@ export async function POST(req: Request) {
         .eq('id', feedback.id)
     }
 
+    // получаем оба автоответа с настройками
+  const { data: autoReplies } = await supabase
+    .from('message_templates')
+    .select('auto_type, text, enabled, conditions')
+    .eq('venue_id', venue_id)
+    .not('auto_type', 'is', null)
+
+  const negative = autoReplies?.find((a) => a.auto_type === 'negative')
+  const positive = autoReplies?.find((a) => a.auto_type === 'positive')
+
+  let autoText: string | null = null
+
+  // 1. негативный: включён + есть условия + хотя бы одно выполнено
+  if (
+    negative?.enabled &&
+    Array.isArray(negative.conditions) &&
+    negative.conditions.length > 0
+  ) {
+    const matched = negative.conditions.some((c: AutoCondition) =>
+      evalAutoCondition(answers, c)
+    )
+    if (matched) autoText = negative.text
+  }
+
+  // 2. позитивный: если негатив не сработал и позитив включён
+  if (!autoText && positive?.enabled && positive.text) {
+    autoText = positive.text
+  }
+
+  if (autoText) {
+    await supabase.from('messages').insert({
+      feedback_id: feedback.id,
+      author: 'manager',
+      manager_id: null,
+      text: autoText,
+    })
+  } else {
     await supabase.from('messages').insert({
       feedback_id: feedback.id,
       author: 'system',
       text: 'Отзыв получен. Менеджер ответит здесь.',
     })
+  }
 
     return NextResponse.json({ token: feedback.anonymous_token })
   } catch (e) {
@@ -110,4 +148,36 @@ async function reattachPhotos(
   }
 
   return changed ? result : answers
+}
+
+type AutoCondition = {
+  field_id: string
+  operator: 'lt' | 'lte' | 'gt' | 'gte' | 'in'
+  value?: number
+  values?: string[]
+}
+
+function evalAutoCondition(
+  answers: Record<string, unknown>,
+  cond: AutoCondition
+): boolean {
+  const v = answers[cond.field_id]
+  if (v == null) return false
+  switch (cond.operator) {
+    case 'lt':
+      return typeof v === 'number' && typeof cond.value === 'number' && v < cond.value
+    case 'lte':
+      return typeof v === 'number' && typeof cond.value === 'number' && v <= cond.value
+    case 'gt':
+      return typeof v === 'number' && typeof cond.value === 'number' && v > cond.value
+    case 'gte':
+      return typeof v === 'number' && typeof cond.value === 'number' && v >= cond.value
+    case 'in': {
+      const list = cond.values ?? []
+      if (Array.isArray(v)) return v.some((x) => list.includes(x as string))
+      return list.includes(v as string)
+    }
+    default:
+      return false
+  }
 }

@@ -40,6 +40,7 @@ export default async function AdminThreadPage({
       .from('message_templates')
       .select('*')
       .eq('venue_id', feedback.venue_id)
+      .is('auto_type', null)
       .order('position'),
   ])
 

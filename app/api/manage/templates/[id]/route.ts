@@ -2,7 +2,7 @@ import { NextResponse } from 'next/server'
 import { createClient } from '@/lib/supabase/server'
 
 const MAX_LABEL = 30
-const MAX_TEXT = 500
+const MAX_TEXT = 2000
 
 async function requireAuth() {
   const supabase = await createClient()

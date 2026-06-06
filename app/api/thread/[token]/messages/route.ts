@@ -2,7 +2,7 @@ import { NextResponse } from 'next/server'
 import { createAdminClient } from '@/lib/supabase/admin'
 import { checkRateLimit } from '@/lib/rate-limit'
 
-const MAX_TEXT_LENGTH = 500
+const MAX_TEXT_LENGTH = 2000
 const MAX_ATTACHMENTS = 4
 
 export async function POST(

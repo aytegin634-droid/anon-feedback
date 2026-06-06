@@ -5,7 +5,7 @@ import { createClient } from '@/lib/supabase/client'
 import { Attachment, Message } from '@/lib/types'
 import SaveLinkBanner from './save-link-banner'
 
-const MAX_TEXT = 500
+const MAX_TEXT = 2000
 const MAX_ATTACHMENTS = 4
 
 type ThreadData = {
