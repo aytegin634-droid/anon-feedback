@@ -208,14 +208,20 @@ function renderField(
 
   switch (field.field_type) {
     case 'short_text':
-      if (field.allow_photos) {
-        return <TextWithPhotosField field={field} value={v} setAnswer={setAnswer} multiline={false} />
-      }
-      return (
-        <input type="text" value={(v as string) ?? ''}
-          onChange={(e) => setAnswer(field.id, e.target.value)}
-          className={inputCls} />
-      )
+    if (field.field_key === 'waiter_name') {
+      return <WaiterNameField field={field} value={v} setAnswer={setAnswer} />
+    }
+    if (field.allow_photos) {
+      return <TextWithPhotosField field={field} value={v} setAnswer={setAnswer} multiline={false} />
+    }
+    return (
+      <input
+        type="text"
+        value={(v as string) ?? ''}
+        onChange={(e) => setAnswer(field.id, e.target.value)}
+        className={inputCls}
+      />
+    )
     case 'long_text':
       if (field.allow_photos) {
         return <TextWithPhotosField field={field} value={v} setAnswer={setAnswer} multiline={true} />
@@ -429,6 +435,42 @@ function SuccessModal({ token }: { token: string }) {
       <button onClick={() => router.push(`/t/${token}`)} className="text-base text-neutral-700 underline font-medium">
         Перейти сейчас
       </button>
+    </div>
+  )
+}
+
+function WaiterNameField({
+  field,
+  value,
+  setAnswer,
+}: {
+  field: FormField
+  value: unknown
+  setAnswer: (id: string, v: unknown) => void
+}) {
+  const isUnknown = value === 'Не помню'
+  const inputCls =
+    'w-full border-2 border-neutral-200 rounded-lg px-3 py-2.5 text-base text-neutral-900 focus:outline-none focus:border-amber-500 transition'
+
+  return (
+    <div className="space-y-2.5">
+      <input
+        type="text"
+        value={isUnknown ? '' : (value as string) ?? ''}
+        disabled={isUnknown}
+        onChange={(e) => setAnswer(field.id, e.target.value)}
+        placeholder={isUnknown ? '—' : 'Имя официанта'}
+        className={`${inputCls} ${isUnknown ? 'opacity-50 bg-neutral-50' : ''}`}
+      />
+      <label className="flex items-center gap-2 cursor-pointer w-fit">
+        <input
+          type="checkbox"
+          checked={isUnknown}
+          onChange={(e) => setAnswer(field.id, e.target.checked ? 'Не помню' : '')}
+          className="w-4 h-4 accent-amber-500"
+        />
+        <span className="text-sm font-medium text-neutral-700">Не помню имя</span>
+      </label>
     </div>
   )
 }
