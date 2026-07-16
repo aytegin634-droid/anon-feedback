@@ -1,6 +1,7 @@
 import { NextResponse } from 'next/server'
 import { Resend } from 'resend'
 import { createAdminClient } from '@/lib/supabase/admin'
+import { sendPushToManagers } from '@/lib/push'
 
 const resend = new Resend(process.env.RESEND_API_KEY!)
 
@@ -85,6 +86,15 @@ async function notifyNewFeedback(feedback: Record<string, unknown>) {
     subject,
     html,
   })
+
+  const guestNameForPush = (feedback.guest_name as string | null) ?? null
+
+  await sendPushToManagers({
+    title: worst && worst.value <= 6 ? `🔴 Низкая оценка ${worst.value}/10` : 'Новый отзыв',
+    body: `${branch ?? venue?.name ?? 'Borsok'}${guestNameForPush ? ` · ${guestNameForPush}` : ''}`,
+    url: `/manage/${feedbackId}`,
+    tag: `feedback-${feedbackId}`,
+  })
 }
 
 async function notifyGuestMessage(message: Record<string, unknown>) {
@@ -123,6 +133,13 @@ async function notifyGuestMessage(message: Record<string, unknown>) {
     to: process.env.NOTIFICATION_TO_EMAIL!,
     subject: `Гость ответил — ${branch ?? venue?.name ?? 'тред'}`,
     html,
+  })
+
+  await sendPushToManagers({
+    title: 'Гость ответил',
+    body: text ? text.slice(0, 120) : 'Прислал фото',
+    url: `/manage/${feedbackId}`,
+    tag: `thread-${feedbackId}`,
   })
 }
 

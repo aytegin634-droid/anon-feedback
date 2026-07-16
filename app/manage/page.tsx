@@ -3,6 +3,7 @@ import Link from 'next/link'
 import { createClient } from '@/lib/supabase/server'
 import InboxClient from './inbox-client'
 import ManageHeader from './manage-header'
+import PushSetup from './push-setup'
 
 export default async function AdminInboxPage() {
   const supabase = await createClient()
@@ -14,8 +15,9 @@ export default async function AdminInboxPage() {
 
   return (
     <div>
-      <div className="bg-white border-b border-neutral-200 px-5 py-4 pl-16 md:pl-5">
+      <div className="bg-white border-b border-neutral-200 px-5 py-4 pl-16 md:pl-5 flex items-center justify-between">
         <h1 className="text-xl font-bold text-neutral-900">Отзывы</h1>
+        <PushSetup />
       </div>
       <Suspense>
         <InboxClient initial={feedbacks ?? []} />

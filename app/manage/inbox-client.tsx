@@ -78,6 +78,17 @@ export default function InboxClient({ initial }: { initial: Item[] }) {
 
   const unreadCount = items.filter((i) => i.unread_for_manager).length
 
+  useEffect(() => {
+      if (typeof navigator === 'undefined') return
+      if (unreadCount > 0) {
+        if ('setAppBadge' in navigator) {
+          navigator.setAppBadge(unreadCount).catch(() => {})
+        }
+      } else if ('clearAppBadge' in navigator) {
+        navigator.clearAppBadge().catch(() => {})
+      }
+    }, [unreadCount])
+
   // ссылка возврата сохраняет текущий URL вместе с фильтром
   const returnTo = `${pathname}${filter !== 'all' ? `?filter=${filter}` : ''}`
 
