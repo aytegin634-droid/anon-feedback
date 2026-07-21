@@ -13,19 +13,29 @@ export async function POST(req: Request) {
       )
     }
 
-    const { venue_id, answers } = await req.json()
+    const { venue_id, form_id, answers } = await req.json()
 
-    if (!venue_id || !answers || typeof answers !== 'object') {
+    if (!venue_id || !form_id || !answers || typeof answers !== 'object') {
       return NextResponse.json({ error: 'invalid_payload' }, { status: 400 })
     }
 
     const supabase = createAdminClient()
 
+    const { data: form } = await supabase
+      .from('forms')
+      .select('id, venue_id, is_system')
+      .eq('id', form_id)
+      .eq('is_active', true)
+      .single()
+    if (!form) {
+      return NextResponse.json({ error: 'form_not_found' }, { status: 404 })
+    }
+
     // находим поле имени по семантическому ключу и достаём значение
     const { data: nameField } = await supabase
       .from('form_fields')
       .select('id')
-      .eq('venue_id', venue_id)
+      .eq('venue_id', form.venue_id)
       .eq('field_key', 'guest_name')
       .maybeSingle()
 
@@ -39,7 +49,7 @@ export async function POST(req: Request) {
 
     const { data: feedback, error } = await supabase
       .from('feedbacks')
-      .insert({ venue_id, answers, guest_name: guestName })
+      .insert({ venue_id: form.venue_id, form_id: form.id, answers, guest_name: guestName })
       .select('id, anonymous_token')
       .single()
 
@@ -62,7 +72,7 @@ export async function POST(req: Request) {
   const { data: autoReplies } = await supabase
     .from('message_templates')
     .select('auto_type, text, enabled, conditions')
-    .eq('venue_id', venue_id)
+    .eq('venue_id', form.venue_id)
     .not('auto_type', 'is', null)
 
   const negative = autoReplies?.find((a) => a.auto_type === 'negative')
@@ -70,21 +80,23 @@ export async function POST(req: Request) {
 
   let autoText: string | null = null
 
-  // 1. негативный: включён + есть условия + хотя бы одно выполнено
-  if (
-    negative?.enabled &&
-    Array.isArray(negative.conditions) &&
-    negative.conditions.length > 0
-  ) {
-    const matched = negative.conditions.some((c: AutoCondition) =>
-      evalAutoCondition(answers, c)
-    )
-    if (matched) autoText = negative.text
-  }
+  if (form.is_system) {
+    // 1. негативный: включён + есть условия + хотя бы одно выполнено
+    if (
+      negative?.enabled &&
+      Array.isArray(negative.conditions) &&
+      negative.conditions.length > 0
+    ) {
+      const matched = negative.conditions.some((c: AutoCondition) =>
+        evalAutoCondition(answers, c)
+      )
+      if (matched) autoText = negative.text
+    }
 
-  // 2. позитивный: если негатив не сработал и позитив включён
-  if (!autoText && positive?.enabled && positive.text) {
-    autoText = positive.text
+    // 2. позитивный: если негатив не сработал и позитив включён
+    if (!autoText && positive?.enabled && positive.text) {
+      autoText = positive.text
+    }
   }
 
   if (autoText) {

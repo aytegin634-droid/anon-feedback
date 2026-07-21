@@ -14,14 +14,24 @@ type Item = {
   last_message_at: string
   unread_for_manager: boolean
   guest_name: string | null   // ← добавить
+  form_id: string | null
 }
 
 type Filter = 'all' | 'unread' | 'new' | 'in_progress' | 'resolved'
 
-export default function InboxClient({ initial }: { initial: Item[] }) {
+export default function InboxClient({
+  initial,
+  forms,
+}: {
+  initial: Item[]
+  forms: { id: string; name: string; is_system: boolean }[]
+}) {
   const searchParams = useSearchParams()
   const pathname = usePathname()  
   const router = useRouter()
+  const formById = new Map(forms.map((f) => [f.id, f]))
+
+  const [formFilter, setFormFilter] = useState<string>('all')
 
   // читаем фильтр из URL один раз при монтировании
   const [filter, setFilterState] = useState<Filter>(() => {
@@ -53,7 +63,7 @@ export default function InboxClient({ initial }: { initial: Item[] }) {
         async () => {
           const { data } = await supabase
             .from('feedbacks')
-            .select('id, anonymous_token, answers, status, created_at, last_message_at, unread_for_manager, guest_name')
+            .select('id, anonymous_token, answers, status, created_at, last_message_at, unread_for_manager, guest_name, form_id')
             .order('last_message_at', { ascending: false })
             .limit(100)
           if (data) setItems(data as Item[])
@@ -71,10 +81,11 @@ export default function InboxClient({ initial }: { initial: Item[] }) {
   }, [router])
 
   const filtered = items.filter((it) => {
-    if (filter === 'all') return true
-    if (filter === 'unread') return it.unread_for_manager
-    return it.status === filter
-  })
+  if (formFilter !== 'all' && it.form_id !== formFilter) return false
+  if (filter === 'all') return true
+  if (filter === 'unread') return it.unread_for_manager
+  return it.status === filter
+})
 
   const unreadCount = items.filter((i) => i.unread_for_manager).length
 
@@ -95,6 +106,16 @@ export default function InboxClient({ initial }: { initial: Item[] }) {
   return (
     <div>
       <div className="bg-white border-b border-neutral-200 px-5 py-2 flex gap-1 overflow-x-auto">
+        <select
+          value={formFilter}
+          onChange={(e) => setFormFilter(e.target.value)}
+          className="ml-auto text-xs border-2 border-neutral-200 rounded-lg px-2 py-1.5 font-medium text-neutral-900"
+        >
+          <option value="all">Все формы</option>
+          {forms.map((f) => (
+            <option key={f.id} value={f.id}>{f.is_system ? 'Только отзывы' : f.name}</option>
+          ))}
+        </select>
         <FilterTab active={filter === 'all'} onClick={() => setFilter('all')}>Все ({items.length})</FilterTab>
         <FilterTab active={filter === 'unread'} onClick={() => setFilter('unread')}>
           Непрочитанные{unreadCount > 0 ? ` (${unreadCount})` : ''}
@@ -112,12 +133,18 @@ export default function InboxClient({ initial }: { initial: Item[] }) {
           <FeedbackCard
             key={item.id}
             item={item}
+            form={item.form_id ? formById.get(item.form_id) : undefined}
             returnTo={returnTo}
             onOpen={() => {
-              // оптимистично помечаем как прочитанное прямо в локальном state
               setItems((prev) =>
                 prev.map((it) =>
-                  it.id === item.id ? { ...it, unread_for_manager: false } : it
+                  it.id === item.id
+                    ? {
+                        ...it,
+                        unread_for_manager: false,
+                        status: it.status === 'new' ? 'in_progress' : it.status,
+                      }
+                    : it
                 )
               )
             }}
@@ -143,10 +170,12 @@ function FilterTab({ active, onClick, children }: { active: boolean; onClick: ()
 
 function FeedbackCard({
   item,
+  form,
   returnTo,
   onOpen,
 }: {
   item: Item
+  form?: { id: string; name: string; is_system: boolean }
   returnTo: string
   onOpen: () => void
 }) {
@@ -189,6 +218,15 @@ function FeedbackCard({
             </span>
           )}
           <StatusBadge status={item.status} />
+          {form && (
+            <span className={`text-xs px-2 py-0.5 rounded font-medium ${
+              form.is_system
+                ? 'bg-amber-100 text-amber-800'
+                : 'bg-blue-100 text-blue-700'
+            }`}>
+              {form.is_system ? 'Отзыв' : form.name}
+            </span>
+          )}
         </div>
         <span className="text-sm font-medium text-neutral-700">{time}</span>
       </div>

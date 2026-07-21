@@ -29,7 +29,8 @@ export async function GET(req: Request) {
       .order('created_at', { ascending: true }),
     supabase
       .from('form_fields')
-      .select('id, label, field_type, position, parent_field_id, options'),
+      .select('id, label, field_type, position, parent_field_id, options')
+      .eq('form_id', '00000000-0000-0000-0000-000000000002')
   ])
 
   if (!feedbacks || !fields) {

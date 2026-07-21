@@ -7,11 +7,14 @@ import PushSetup from './push-setup'
 
 export default async function AdminInboxPage() {
   const supabase = await createClient()
-  const { data: feedbacks } = await supabase
+  const [{ data: feedbacks }, { data: forms }] = await Promise.all([
+  supabase
     .from('feedbacks')
-    .select('id, anonymous_token, answers, status, created_at, last_message_at, unread_for_manager, guest_name')
+    .select('id, anonymous_token, answers, status, created_at, last_message_at, unread_for_manager, guest_name, form_id')
     .order('last_message_at', { ascending: false })
-    .limit(100)
+    .limit(100),
+  supabase.from('forms').select('id, name, is_system').order('is_system', { ascending: false }),
+])
 
   return (
     <div>
@@ -20,7 +23,7 @@ export default async function AdminInboxPage() {
         <PushSetup />
       </div>
       <Suspense>
-        <InboxClient initial={feedbacks ?? []} />
+        <InboxClient initial={feedbacks ?? []} forms={forms ?? []} />
       </Suspense>
     </div> 
   )

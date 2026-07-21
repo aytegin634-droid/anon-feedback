@@ -317,7 +317,8 @@ function AutoReplySection({ conditionFields }: { conditionFields: ConditionField
       <div>
         <h2 className="text-sm font-bold text-neutral-900 mb-1">Автоответы</h2>
         <p className="text-xs text-neutral-700">
-          Отправляются гостю автоматически сразу после отзыва
+          Отправляются гостю автоматически сразу после отзыва.
+          Работают <strong>только для системной формы «Отзывы»</strong> — на дополнительные формы не действуют.
         </p>
       </div>
 

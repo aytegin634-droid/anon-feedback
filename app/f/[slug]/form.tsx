@@ -12,9 +12,11 @@ type TextWithPhotos = { text: string; photos: PhotoRef[] }
 
 export default function FeedbackForm({
   venue,
+  formId,
   fields,
 }: {
   venue: Venue
+  formId: string
   fields: FormField[]
 }) {
   const router = useRouter()
@@ -122,7 +124,7 @@ export default function FeedbackForm({
       const res = await fetch('/api/feedback/submit', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ venue_id: venue.id, answers: finalAnswers }),
+        body: JSON.stringify({ venue_id: venue.id, form_id: formId, answers: finalAnswers }),
       })
       if (res.status === 429) {
         const { retryAfter } = await res.json()

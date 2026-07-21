@@ -47,6 +47,9 @@ async function notifyNewFeedback(feedback: Record<string, unknown>) {
   const answers = feedback.answers as Record<string, unknown>
   const token = feedback.anonymous_token as string
 
+  const { data: formRow } = await supabase
+  .from('forms').select('name, is_system').eq('id', feedback.form_id as string).maybeSingle()
+
   const [{ data: venue }, { data: fields }] = await Promise.all([
     supabase.from('venues').select('name').eq('id', venueId).single(),
     supabase
@@ -80,10 +83,14 @@ async function notifyNewFeedback(feedback: Record<string, unknown>) {
     return `Новый отзыв ${worst.value}/10 — ${place}`
   })()
 
+  const finalSubject = formRow && !formRow.is_system
+  ? `📋 ${formRow.name} — новый ответ`
+  : subject
+
   await resend.emails.send({
     from: process.env.NOTIFICATION_FROM_EMAIL!,
     to: process.env.NOTIFICATION_TO_EMAIL!,
-    subject,
+    subject: finalSubject,
     html,
   })
 

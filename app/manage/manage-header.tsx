@@ -8,18 +8,19 @@ export default function ManageSidebar() {
   const pathname = usePathname()
   const [open, setOpen] = useState(false)
 
-  // на логине сайдбар не показываем
-  if (pathname === '/manage/login') return null
-
   // закрывать сайдбар при переходе по ссылке
   useEffect(() => {
     setOpen(false)
   }, [pathname])
 
+ // на логине сайдбар не показываем
+  if (pathname === '/manage/login') return null
+
   const links = [
     { href: '/manage', label: 'Отзывы', icon: '📥' },
     { href: '/manage/stats', label: 'Статистика', icon: '📊' },
     { href: '/manage/templates', label: 'Шаблоны', icon: '💬' },
+    { href: '/manage/forms', label: 'Формы', icon: '📋' },
   ]
 
   const isActive = (href: string) => {
