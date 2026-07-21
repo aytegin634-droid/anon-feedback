@@ -49,19 +49,6 @@ export default async function AdminThreadPage({
     .maybeSingle(),
 ])
 
-  // помечаем как прочитанное; если статус "new" — переводим в работу
-  // (просмотр = менеджер увидел и взял в обработку)
-  await supabase
-    .from('feedbacks')
-    .update({ unread_for_manager: false })
-    .eq('id', id)
-
-  await supabase
-    .from('feedbacks')
-    .update({ status: 'in_progress' })
-    .eq('id', id)
-    .eq('status', 'new')
-
   return (
   <ThreadAdminView
     feedback={{ ...feedback, status: feedback.status === 'new' ? 'in_progress' : feedback.status }}

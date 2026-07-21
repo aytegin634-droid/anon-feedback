@@ -62,6 +62,10 @@ export default function ThreadAdminView({
     messagesEndRef.current?.scrollIntoView({ behavior: 'smooth' })
   }, [messages.length])
 
+  useEffect(() => {
+    fetch(`/api/manage/feedbacks/${feedback.id}/mark-read`, { method: 'POST' })
+  }, [feedback.id])
+
   const send = async () => {
     const t = text.trim()
     if (!t || sending) return
