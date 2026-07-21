@@ -20,29 +20,34 @@ export default async function AdminThreadPage({
 
   if (!feedback) notFound()
 
-  const [{ data: messages }, { data: fields }, { data: venue }, { data: templates }] = await Promise.all([
-    supabase
-      .from('messages')
-      .select('*')
-      .eq('feedback_id', id)
-      .order('created_at'),
-    supabase
-      .from('form_fields')
-      .select('*')
-      .eq('venue_id', feedback.venue_id)
-      .order('position'),
-    supabase
-      .from('venues')
-      .select('name')
-      .eq('id', feedback.venue_id)
-      .single(),
-    supabase
-      .from('message_templates')
-      .select('*')
-      .eq('venue_id', feedback.venue_id)
-      .is('auto_type', null)
-      .order('position'),
-  ])
+  const [{ data: messages }, { data: fields }, { data: venue }, { data: templates }, { data: formRow }] = await Promise.all([
+  supabase
+    .from('messages')
+    .select('*')
+    .eq('feedback_id', id)
+    .order('created_at'),
+  supabase
+    .from('form_fields')
+    .select('*')
+    .eq('form_id', feedback.form_id)
+    .order('position'),
+  supabase
+    .from('venues')
+    .select('name')
+    .eq('id', feedback.venue_id)
+    .single(),
+  supabase
+    .from('message_templates')
+    .select('*')
+    .eq('venue_id', feedback.venue_id)
+    .is('auto_type', null)
+    .order('position'),
+  supabase
+    .from('forms')
+    .select('name, is_system')
+    .eq('id', feedback.form_id)
+    .maybeSingle(),
+])
 
   // помечаем как прочитанное; если статус "new" — переводим в работу
   // (просмотр = менеджер увидел и взял в обработку)
@@ -64,6 +69,7 @@ export default async function AdminThreadPage({
     fields={fields ?? []}
     venue={venue ?? { name: '' }}
     templates={templates ?? []}
+    form={formRow ?? null}
   />
 )
 }

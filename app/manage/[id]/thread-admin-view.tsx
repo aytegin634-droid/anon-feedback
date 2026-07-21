@@ -16,12 +16,14 @@ export default function ThreadAdminView({
   fields,
   venue,
   templates,
+  form,
 }: {
   feedback: Feedback
   initialMessages: Message[]
   fields: FormField[]
   venue: { name: string }
   templates: Template[]
+  form: { name: string; is_system: boolean } | null
 }) {
   const router = useRouter()
   const [messages, setMessages] = useState<Message[]>(initialMessages)
@@ -121,6 +123,18 @@ export default function ThreadAdminView({
                 <div className="text-xs text-amber-700 font-medium">Гость представился</div>
                 <div className="text-sm font-semibold text-neutral-900">{feedback.guest_name}</div>
               </div>
+            </div>
+          )}
+          {form && (
+            <div>
+              <div className="text-xs text-neutral-700 mb-1">Форма</div>
+              <span className={`inline-block text-xs px-2 py-0.5 rounded font-semibold ${
+                form.is_system
+                  ? 'bg-amber-100 text-amber-800'
+                  : 'bg-blue-100 text-blue-700'
+              }`}>
+                {form.is_system ? 'Отзыв' : form.name}
+              </span>
             </div>
           )}
           <div>
