@@ -1,11 +1,10 @@
 import { NextResponse } from 'next/server'
 import { createClient } from '@/lib/supabase/server'
 
-function loginUrl(req?: Request) {
-  return new URL(
-    '/manage/login',
-    process.env.NEXT_PUBLIC_SITE_URL ?? req?.url ?? 'http://localhost:3000'
-  )
+// Возвращаем на логин того же адреса, с которого пришли: сайт открыт и на своём домене,
+// и на *.vercel.app — вход (cookie) у каждого адреса свой.
+function loginUrl(req: Request) {
+  return new URL('/manage/login', req.url)
 }
 
 export async function POST(req: Request) {
@@ -16,7 +15,7 @@ export async function POST(req: Request) {
   return NextResponse.redirect(loginUrl(req), 303)
 }
 
-export async function GET() {
+export async function GET(req: Request) {
   // если пользователь по ошибке окажется здесь через back-кнопку — отправим на логин
-  return NextResponse.redirect(loginUrl(), 303)
+  return NextResponse.redirect(loginUrl(req), 303)
 }
